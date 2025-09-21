@@ -1,0 +1,68 @@
+name: Build and deploy React app to Azure Web App - React-Pizza
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # Step 1: Checkout repo
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      # Step 2: Setup Node.js (use LTS, stable for Azure)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      # Step 3: Install dependencies and build React
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
+
+      # Step 4: Upload build folder as artifact
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: react-build
+          path: build
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      # Step 1: Download the build artifact
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: react-build
+          path: build
+
+      # Step 2: Login to Azure
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_0CAC13F6ECD14C5384CA3042E1B98889 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_E74DCC5281AD48E8957177F1332B093C }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_538B556DAD334B75B4A8A535726170CC }}
+
+      # Step 3: Deploy to Azure Web App
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'React-Pizza' # Replace with your App Service name
+          slot-name: 'Production'
+          package: build
