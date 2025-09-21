@@ -144,7 +144,6 @@
 // };
 
 // export default Dashboard;
-
 import React, { useEffect, useState } from 'react';
 import { useUser } from './UserContext';
 import {
@@ -159,7 +158,7 @@ const Dashboard = () => {
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
-  
+  const [orders, setOrders] = useState([]); // ✅ keep this, since we use setOrders
   const [cart, setCart] = useState([]);
   const [previousOrders, setPreviousOrders] = useState([]);
 
@@ -171,7 +170,7 @@ const Dashboard = () => {
       setBrands(brands);
       setCategories(categories);
       setProducts(products);
-      setOrders(orders);
+      setOrders(orders); // ✅ still needed
       setCart(getCartItems(enriched));
       setPreviousOrders(getPreviousOrders(enriched));
     };
@@ -237,7 +236,9 @@ const Dashboard = () => {
           <div className="card text-white bg-danger h-100">
             <div className="card-body">
               <h5 className="card-title">Your Orders</h5>
-              <p className="card-text display-6">{cart.length + previousOrders.length}</p>
+              <p className="card-text display-6">
+                {cart.length + previousOrders.length}
+              </p>
             </div>
           </div>
         </div>
@@ -253,12 +254,28 @@ const Dashboard = () => {
             <div className="col" key={order.id}>
               <div className="card h-100 shadow-sm">
                 <div className="card-body">
-                  <h5 className="card-title">{order.product?.productName || 'Unknown Product'}</h5>
-                  <p className="card-text mb-1">Quantity: <strong>{order.quantity}</strong></p>
-                  <p className="card-text mb-3">Price: <strong>₹{order.product?.price ?? 'N/A'}</strong></p>
+                  <h5 className="card-title">
+                    {order.product?.productName || 'Unknown Product'}
+                  </h5>
+                  <p className="card-text mb-1">
+                    Quantity: <strong>{order.quantity}</strong>
+                  </p>
+                  <p className="card-text mb-3">
+                    Price: <strong>₹{order.product?.price ?? 'N/A'}</strong>
+                  </p>
                   <div className="d-flex justify-content-end gap-2">
-                    <button className="btn btn-sm btn-success" onClick={() => handleBuyNow(order)}>🛒 Buy Now</button>
-                    <button className="btn btn-sm btn-danger" onClick={() => handleDelete(order)}>🗑️ Delete</button>
+                    <button
+                      className="btn btn-sm btn-success"
+                      onClick={() => handleBuyNow(order)}
+                    >
+                      🛒 Buy Now
+                    </button>
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={() => handleDelete(order)}
+                    >
+                      🗑️ Delete
+                    </button>
                   </div>
                 </div>
               </div>
@@ -274,9 +291,14 @@ const Dashboard = () => {
       ) : (
         <ul className="list-group">
           {previousOrders.map((order) => (
-            <li key={order.id} className="list-group-item d-flex justify-content-between align-items-center">
+            <li
+              key={order.id}
+              className="list-group-item d-flex justify-content-between align-items-center"
+            >
               {order.product?.productName || 'Unknown Product'}
-              <span className="badge bg-success rounded-pill">Qty: {order.quantity}</span>
+              <span className="badge bg-success rounded-pill">
+                Qty: {order.quantity}
+              </span>
             </li>
           ))}
         </ul>
