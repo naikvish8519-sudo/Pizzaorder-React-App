@@ -823,8 +823,10 @@ const ProductList = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const pizzaRes = await fetch("http://localhost:5259/api/pizzas");
-        const toppingRes = await fetch("http://localhost:5259/api/toppings");
+        //const pizzaRes = await fetch("http://localhost:5259/api/pizzas");
+        //const toppingRes = await fetch("http://localhost:5259/api/toppings");
+const pizzaRes = await fetch("https://micro-productservice-b2g0g5gafpawcsdf.japanwest-01.azurewebsites.net/api/pizzas");
+ const toppingRes = await fetch("https://micro-productservice-b2g0g5gafpawcsdf.japanwest-01.azurewebsites.net/api/toppings");
 
         const pizzaData = await pizzaRes.json();
         const toppingData = await toppingRes.json();

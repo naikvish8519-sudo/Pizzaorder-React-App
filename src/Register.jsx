@@ -165,16 +165,28 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:7186/api/Auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          personName: formData.fullName,
-          gender: formData.gender,
-        }),
-      });
+      // const response = await fetch("http://localhost:7186/api/Auth/register", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({
+      //     email: formData.email,
+      //     password: formData.password,
+      //     personName: formData.fullName,
+      //     gender: formData.gender,
+      //   }),
+      // });
+
+      const response = await fetch("https://micro-userservice-h2gtehf8eddpbscd.canadacentral-01.azurewebsites.net/api/Auth/register", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    email: formData.email,
+    password: formData.password,
+    personName: formData.fullName,
+    gender: formData.gender,
+  }),
+});
+
 
       if (response.ok) {
         setSuccess(true);

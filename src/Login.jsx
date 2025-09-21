@@ -20,20 +20,31 @@ const Login = () => {
       return;
     }
   try {
-  debugger;
-   console.log('Login request payload:', { email, password });
-  const response = await fetch('http://localhost:7186/api/Auth/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
+   
+  // const response = await fetch('http://localhost:7186/api/Auth/login', {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  //   body: JSON.stringify({
      
 
-      email: email,
-      password: password,
-    }),
-  });
+  //     email: email,
+  //     password: password,
+  //   }),
+  // });
+
+  const response = await fetch('https://micro-userservice-h2gtehf8eddpbscd.canadacentral-01.azurewebsites.net/api/Auth/login', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    email: email,
+    password: password,
+  }),
+});
+
 
   if (!response.ok) {
     // log details of response error
