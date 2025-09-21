@@ -159,7 +159,7 @@ const Dashboard = () => {
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]);
+  
   const [cart, setCart] = useState([]);
   const [previousOrders, setPreviousOrders] = useState([]);
 
