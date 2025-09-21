@@ -29,12 +29,12 @@ jobs:
           npm ci
           npm run build
 
-      # Step 4: Upload build folder as artifact
-      - name: Upload build artifact
+      # Step 4: Upload entire project (not just build)
+      - name: Upload project artifact
         uses: actions/upload-artifact@v4
         with:
-          name: react-build
-          path: build
+          name: react-app
+          path: .   # 👈 includes build/, server.js, package.json
 
   deploy:
     runs-on: ubuntu-latest
@@ -44,12 +44,12 @@ jobs:
       contents: read
 
     steps:
-      # Step 1: Download the build artifact
-      - name: Download build artifact
+      # Step 1: Download the project artifact
+      - name: Download project artifact
         uses: actions/download-artifact@v4
         with:
-          name: react-build
-          path: build
+          name: react-app
+          path: .
 
       # Step 2: Login to Azure
       - name: Azure Login
@@ -65,4 +65,4 @@ jobs:
         with:
           app-name: 'React-Pizza' # Replace with your App Service name
           slot-name: 'Production'
-          package: build
+          package: .              # 👈 deploy full project, not just build/
