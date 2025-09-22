@@ -950,7 +950,8 @@ const CartComponent = () => {
     try {
       setLoading(true);
       const res = await fetch(
-        `http://localhost:5043/api/PizzaOrders/search/userid/${user.userID}`
+        //`http://localhost:5043/api/PizzaOrders/search/userid/${user.userID}`        
+        `https://micro-orderservice-bnc2gjg2h5emhqby.canadacentral-01.azurewebsites.net/api/PizzaOrders/search/userid/${user.userID}`
       );
       if (!res.ok) throw new Error("Failed to fetch orders");
       const data = await res.json();
@@ -984,8 +985,8 @@ const CartComponent = () => {
         quantity: item.quantity,
         isOrdered: false,
       };
-
-      const res = await fetch("http://localhost:5043/api/PizzaOrders", {
+//"http://localhost:5043/api/PizzaOrders"
+      const res = await fetch("https://micro-orderservice-bnc2gjg2h5emhqby.canadacentral-01.azurewebsites.net/api/PizzaOrders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -1018,7 +1019,7 @@ const CartComponent = () => {
           isOrdered: true,
         };
 
-        const res = await fetch("http://localhost:5043/api/PizzaOrders", {
+        const res = await fetch("https://micro-orderservice-bnc2gjg2h5emhqby.canadacentral-01.azurewebsites.net/api/PizzaOrders", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -1043,7 +1044,7 @@ const CartComponent = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:5043/api/PizzaOrders/${orderID}`, {
+      const res = await fetch(`https://micro-orderservice-bnc2gjg2h5emhqby.canadacentral-01.azurewebsites.net/api/PizzaOrders/${orderID}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isOrdered: true }),
@@ -1060,7 +1061,7 @@ const CartComponent = () => {
   // ✅ Remove saved cart item
   const removeDbCartItem = async (orderID) => {
     try {
-      const res = await fetch(`http://localhost:5043/api/PizzaOrders/${orderID}`, {
+      const res = await fetch(`https://micro-orderservice-bnc2gjg2h5emhqby.canadacentral-01.azurewebsites.net/api/PizzaOrders/${orderID}`, {
         method: "DELETE",
       });
 
