@@ -806,8 +806,6 @@
 
 
 
-
-
 import React, { useEffect, useState } from "react";
 import { useCart } from "./CartContext"; // ✅ use global cart
 import "./pizza.css";
@@ -818,18 +816,30 @@ const ProductList = () => {
   const [nonVegToppings, setNonVegToppings] = useState([]);
   const [sizesQty, setSizesQty] = useState({});
   const [toppingsMap, setToppingsMap] = useState({});
+  const [loading, setLoading] = useState(true); // ✅ NEW loading state
   const { addToCart } = useCart(); // ✅ get addToCart from context
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        //const pizzaRes = await fetch("http://localhost:5259/api/pizzas");
-        //const toppingRes = await fetch("http://localhost:5259/api/toppings");
-const pizzaRes = await fetch("https://micro-productservice-b2g0g5gafpawcsdf.japanwest-01.azurewebsites.net/api/pizzas");
- const toppingRes = await fetch("https://micro-productservice-b2g0g5gafpawcsdf.japanwest-01.azurewebsites.net/api/toppings");
+        setLoading(true); // start loading
+
+        
+     
+        const pizzaRes = await fetch(
+          "https://micro-productservice-b2g0g5gafpawcsdf.japanwest-01.azurewebsites.net/api/pizzas"
+        );
+        const toppingRes = await fetch(
+          "https://micro-productservice-b2g0g5gafpawcsdf.japanwest-01.azurewebsites.net/api/toppings"
+        );
 
         const pizzaData = await pizzaRes.json();
         const toppingData = await toppingRes.json();
+
+          await new Promise((resolve) => setTimeout(resolve, 3000));
 
         setPizzaSizes(pizzaData);
 
@@ -854,11 +864,14 @@ const pizzaRes = await fetch("https://micro-productservice-b2g0g5gafpawcsdf.japa
         setToppingsMap(initialToppings);
       } catch (err) {
         console.error("Error loading pizza data:", err);
+      } finally {
+        setLoading(false); // stop loading
       }
     };
 
     fetchData();
   }, []);
+
 
   const increaseQuantity = (pizzaId) => {
     setSizesQty((prev) => ({ ...prev, [pizzaId]: prev[pizzaId] + 1 }));
@@ -919,115 +932,123 @@ const pizzaRes = await fetch("https://micro-productservice-b2g0g5gafpawcsdf.japa
     0
   );
 
+  // ✅ Show spinner + sentence while loading
+ if (loading) {
+  return (
+    <div className="cart-container text-center mt-5">
+      <div className="spinner-border text-primary" role="status"></div>
+      <h3 className="mt-3">Loading delicious pizzas for you...</h3>
+    </div>
+  );
+}
+
+
   return (
     <div className="productlist-wrapper">
-    <div className="container">
-      <h2 className="text-center mb-4 pizza-header gradient-header">
-        Pick Your Order
-        <img
-          src="https://img.freepik.com/free-vector/colorful-round-tasty-pizza_1284-10219.jpg?semt=ais_hybrid"
-          alt="Pizza Icon"
-          style={{ width: 100, height: 100, marginLeft: 10 }}
-        />
-      </h2>
+      <div className="container">
+        <h2 className="text-center mb-4 pizza-header gradient-header">
+          Pick Your Order
+          <img
+            src="https://img.freepik.com/free-vector/colorful-round-tasty-pizza_1284-10219.jpg?semt=ais_hybrid"
+            alt="Pizza Icon"
+            style={{ width: 100, height: 100, marginLeft: 10 }}
+          />
+        </h2>
 
-      <div className="row">
-        {pizzaSizes.map((p) => (
-          <div className="col-md-3" key={p.id}>
-            <div className="card mb-4">
-              <div className="card-fill"></div> {/* Gradient fill */}
-              <div className="card-body text-center">
-                <h4 style={{ color: "white", fontWeight: "bold" }}>
-                  {p.name} - {p.size} (${p.price.toFixed(2)})
-                </h4>
+        <div className="row">
+          {pizzaSizes.map((p) => (
+            <div className="col-md-3" key={p.id}>
+              <div className="card mb-4">
+                <div className="card-fill"></div> {/* Gradient fill */}
+                <div className="card-body text-center">
+                  <h4 style={{ color: "white", fontWeight: "bold" }}>
+                    {p.name} - {p.size} (${p.price.toFixed(2)})
+                  </h4>
 
-                <div className="quantity-controls">
+                  <div className="quantity-controls">
+                    <button
+                      onClick={() => decreaseQuantity(p.id)}
+                      disabled={sizesQty[p.id] <= 0}
+                      className="btn btn-secondary"
+                    >
+                      -
+                    </button>
+                    <span className="quantity-display">
+                      {sizesQty[p.id] || 0}
+                    </span>
+                    <button
+                      onClick={() => increaseQuantity(p.id)}
+                      className="btn btn-secondary"
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <h5 style={{ color: "white", fontWeight: "bold" }}>
+                    Total for {p.size}: ${calculateSizePrice(p.id).toFixed(2)}
+                  </h5>
+
+                  <h5 style={{ color: "white", fontWeight: "bold" }}>
+                    Select Veg Toppings:
+                  </h5>
+                  {vegToppings.map((t) => (
+                    <label key={t.name} className="toggle-button">
+                      <input
+                        type="checkbox"
+                        checked={
+                          toppingsMap[p.id]?.find((x) => x.name === t.name)
+                            ?.selected || false
+                        }
+                        onChange={() => toggleTopping(p.id, t.name)}
+                      />
+                      <span className="slider"></span>
+                      {t.name} (${t.price.toFixed(2)})
+                    </label>
+                  ))}
+
+                  <h5 style={{ color: "white", fontWeight: "bold" }}>
+                    Select Non-Veg Toppings:
+                  </h5>
+                  {nonVegToppings.map((t) => (
+                    <label key={t.name} className="toggle-button">
+                      <input
+                        type="checkbox"
+                        checked={
+                          toppingsMap[p.id]?.find((x) => x.name === t.name)
+                            ?.selected || false
+                        }
+                        onChange={() => toggleTopping(p.id, t.name)}
+                      />
+                      <span className="slider"></span>
+                      {t.name} (${t.price.toFixed(2)})
+                    </label>
+                  ))}
+
                   <button
-                    onClick={() => decreaseQuantity(p.id)}
-                    disabled={sizesQty[p.id] <= 0}
-                    className="btn btn-secondary"
+                    onClick={() => addToCartHandler(p.id)}
+                    className="btn btn-success mt-3"
                   >
-                    -
+                    <i className="fas fa-shopping-cart"></i> Add to Cart
                   </button>
-                  <span className="quantity-display">
-                    {sizesQty[p.id] || 0}
-                  </span>
-                  <button
-                    onClick={() => increaseQuantity(p.id)}
-                    className="btn btn-secondary"
+
+                  <h4
+                    className="total-selection-price mt-3"
+                    style={{ color: "white", fontWeight: "bold" }}
                   >
-                    +
-                  </button>
-                 
+                    Total Price: ${calculateSizePrice(p.id).toFixed(2)}
+                  </h4>
                 </div>
-
-                <h5 style={{ color: "white", fontWeight: "bold" }}>
-                  Total for {p.size}: ${calculateSizePrice(p.id).toFixed(2)}
-                </h5>
-
-                <h5 style={{ color: "white", fontWeight: "bold" }}>
-                  Select Veg Toppings:
-                </h5>
-                {vegToppings.map((t) => (
-                  <label key={t.name} className="toggle-button">
-                    <input
-                      type="checkbox"
-                      checked={
-                        toppingsMap[p.id]?.find((x) => x.name === t.name)
-                          ?.selected || false
-                      }
-                      onChange={() => toggleTopping(p.id, t.name)}
-                    />
-                    <span className="slider"></span>
-                    {t.name} (${t.price.toFixed(2)})
-                  </label>
-                ))}
-
-                <h5 style={{ color: "white", fontWeight: "bold" }}>
-                  Select Non-Veg Toppings:
-                </h5>
-                {nonVegToppings.map((t) => (
-                  <label key={t.name} className="toggle-button">
-                    <input
-                      type="checkbox"
-                      checked={
-                        toppingsMap[p.id]?.find((x) => x.name === t.name)
-                          ?.selected || false
-                      }
-                      onChange={() => toggleTopping(p.id, t.name)}
-                    />
-                    <span className="slider"></span>
-                    {t.name} (${t.price.toFixed(2)})
-                  </label>
-                ))}
-
-                <button
-                  onClick={() => addToCartHandler(p.id)}
-                  className="btn btn-success mt-3"
-                >
-                  <i className="fas fa-shopping-cart"></i> Add to Cart
-                </button>
-
-                <h4
-                  className="total-selection-price mt-3"
-                  style={{ color: "white", fontWeight: "bold" }}
-                >
-                  Total Price: ${calculateSizePrice(p.id).toFixed(2)}
-                </h4>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <div className="grand-total-strip">
-        <h3 className="grand-total">Grand Total: ${grandTotal.toFixed(2)}</h3>
+        <div className="grand-total-strip">
+          <h3 className="grand-total">Grand Total: ${grandTotal.toFixed(2)}</h3>
+        </div>
       </div>
-    </div>
     </div>
   );
 };
 
 export default ProductList;
-
-
