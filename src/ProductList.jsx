@@ -818,7 +818,7 @@ const ProductList = () => {
   const [toppingsMap, setToppingsMap] = useState({});
   const [loading, setLoading] = useState(true); // ✅ NEW loading state
   const { addToCart } = useCart(); // ✅ get addToCart from context
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  
 
 
 
